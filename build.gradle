@@ -8,9 +8,13 @@ buildscript {
         maven {
             url 'https://alphacephei.com/maven/'
         }
+        flatDir {
+            dirs 'lib'
+        }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:4.0.1'
+        classpath 'de.undercouch:gradle-download-task:3.4.3'
     }
 }
 
@@ -21,6 +25,9 @@ allprojects {
         mavenCentral()
         maven {
             url 'https://alphacephei.com/maven/'
+        }
+        flatDir {
+            dirs 'lib'
         }
     }
 }

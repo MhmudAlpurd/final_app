@@ -1,21 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <string name="app_name">Cogniteye ASR</string>
-    <string name="recognize_file">Recognize File</string>
-    <string name="recognize_microphone">Start Microphone</string>
-    <string name="stop_microphone">Stop Microphone</string>
-    <string name="preparing">Preparing the recognizer\n</string>
-    <string name="ready">Ready\n</string>
-    <string name="failed">Failed to init recognizer %s\n</string>
-    <string name="elapsed">Result %s elapsed %d milliseconds\n</string>
-    <string name="starting">Starting\n</string>
-    <string name="say_something">Say something\n</string>
-    <string name="stop_file">Stop File</string>
-    <string name="pause">Pause</string>
-    <string name="continueRecognition">Continue</string>
-    <string name="kendrick">Kendrick</string>
-    <string name="already_have_an_account">Already have an account?</string>
-
-
+    <string name="tfe_od_app_name" translation_description="Object Detection demo app [CHAR_LIMIT=40]">Cogniteye OD</string>
+    <string name="tfe_od_camera_error" translation_description="Error regarding camera support[CHAR_LIMIT=40]">This device doesn\'t support Camera2 API.</string>
 </resources>
