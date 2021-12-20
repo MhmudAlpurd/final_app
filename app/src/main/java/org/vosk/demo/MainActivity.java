@@ -50,19 +50,10 @@ public class MainActivity extends AppCompatActivity {
             vosk.recognize();
      }
 
-
-
-
-
-
     }
 
 
-
-
-    public static Context getmContext() {
-        return mContext;
-    }
+    public static Context getmContext() { return mContext; }
 
     public static Activity getmActivity(){return mActivity; }
 
