@@ -1,4 +1,4 @@
-package org.vosk.demo;
+package org.vosk.demo.asr;
 import android.util.Log;
 
 import java.util.* ;
@@ -22,9 +22,6 @@ public class COMMANDREC {
     static long endTime;
     static long activeTime = 15000; //ms
 
-    public static void main(String args[]) {
-
-    }
 
     public static String find_madule_and_object(String RESULT_TEXT) {
 

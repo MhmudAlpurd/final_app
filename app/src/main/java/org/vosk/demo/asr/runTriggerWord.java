@@ -1,4 +1,4 @@
-package org.vosk.demo;
+package org.vosk.demo.asr;
 
 import java.util.Arrays;
 import java.util.Collection;
