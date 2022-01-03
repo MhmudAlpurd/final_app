@@ -86,12 +86,12 @@ public class COMMANDREC {
         String[] result_words = result_txt.split(" ");
         ArrayList<String> result_words_lst=new ArrayList<String>();
 
+
         //preprocessing result words.
         for(String i : result_words){
             i = i.toLowerCase().trim();
             result_words_lst.add(i);
         }
-
         //convert list to collection to use remove() function.
         Collection result_word_lst_col= new ArrayList(result_words_lst);
 
@@ -105,14 +105,13 @@ public class COMMANDREC {
 
         endTime = new Date().getTime();
         long time = endTime - startTime;
-        Log.v("test100", time + " time");
         // Find the Madule
         if(result_words_len >= 2 && time < activeTime){
             first_word = result_words_lst.get(0).toLowerCase().trim();
-            Log.v("test0101", first_word);
 
             // the  main lists include the first word?
             int idx_1 = find_madule_index(main_lst_names_lst, first_word);
+
             pr("idx_1: " + idx_1 );
             switch(idx_1){
                 case -1:
@@ -144,6 +143,7 @@ public class COMMANDREC {
                     }
                     break;
                 default:
+                    Log.v("resulttt01", "idx_default"+ "ok");
                     //Double check with secondary lists.
                     //just search in same category of secondary lists and main lists.
                     pr("double_check_section");
@@ -248,6 +248,8 @@ public class COMMANDREC {
                 FINAL_MADULE_IDX = idx_element_secondary_names;
                 if (idx_element_secondary_names == 1) {
                     FINAL_OBJECT =  find_object(list_result_word);
+                }else {
+                    FINAL_OBJECT = "Nothing";
                 }
                 break;
             }

@@ -36,7 +36,7 @@ public class DetectorFactory {
                     10,13, 16,30, 33,23, 30,61, 62,45, 59,119, 116,90, 156,198, 373,326
             };
         }
-        else if (modelFilename.equals("yolov5m_int8.tflite")) {
+        else if (modelFilename.equals("yolov5m_fp162.tflite")) {
             labelFilename = "file:///android_asset/coco.txt";
             isQuantized = true;
             inputSize = 320;

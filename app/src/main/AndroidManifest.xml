@@ -10,8 +10,10 @@
         android:required="true" />
 
     <uses-permission android:name="android.permission.CAMERA" />
+
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
+
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -30,12 +32,18 @@
         android:icon="@drawable/cogniteye"
         android:installLocation="internalOnly"
         android:label="@string/tfe_od_app_name"
+        android:largeHeap="true"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.ObjectDetection">
-
-
+        <activity
+            android:name=".DevActivity"
+            android:exported="true" />
         <activity
             android:name=".MainActivity"
+            android:exported="true" />
+        <activity
+            android:name=".RoootActivity"
+            android:exported="true"
             android:label="@string/tfe_od_app_name"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -44,9 +52,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <activity android:name=".asr.Vosk"
-            android:exported="true"/>
+        <activity
+            android:name=".asr.Vosk"
+            android:exported="true" />
         <activity
             android:name=".od.DetectorActivity"
             android:exported="true" />
@@ -54,4 +62,5 @@
             android:name=".od.CameraActivity"
             android:exported="true" />
     </application>
+
 </manifest>

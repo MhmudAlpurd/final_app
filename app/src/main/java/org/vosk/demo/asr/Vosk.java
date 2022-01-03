@@ -16,6 +16,7 @@ package org.vosk.demo.asr;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.util.Log;
@@ -36,11 +37,24 @@ import org.vosk.android.RecognitionListener;
 import org.vosk.android.SpeechService;
 import org.vosk.android.SpeechStreamService;
 import org.vosk.android.StorageService;
+import org.vosk.demo.Callback;
 import org.vosk.demo.MainActivity;
+import org.vosk.demo.R;
+import org.vosk.demo.RoootActivity;
+import org.vosk.demo.tts.Speech;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
-public class Vosk extends AppCompatActivity implements RecognitionListener {
+public class Vosk implements RecognitionListener {
+
+    MyCallback myCallback = null;
+    public Vosk(MyCallback callback) {
+        this.myCallback = callback;
+    }
+
 
     static private final int STATE_START = 0;
     static private final int STATE_READY = 1;
@@ -48,25 +62,21 @@ public class Vosk extends AppCompatActivity implements RecognitionListener {
     static private final int STATE_FILE = 3;
     static private final int STATE_MIC = 4;
 
+    List resultVosk = new ArrayList();
+
     /* Used to handle permission request */
     private static final int PERMISSIONS_REQUEST_RECORD_AUDIO = 1;
 
     private Model model;
     private SpeechService speechService;
     private SpeechStreamService speechStreamService;
-    private TextView moduletask;
-    private TextView modulename;
-    private TextView recievedcommand;
-    private ImageView img_module;
-    COMMANDREC find_required_madule = new COMMANDREC();
 
 
     public void recognize() {
         Log.v("result01", "1");
         // findViewById(R.id.recognize_mic).setOnClickListener(view -> recognizeMicrophone());
-        //((ToggleButton) findViewById(R.id.pause)).setOnCheckedChangeListener((view, isChecked) -> pause(isChecked));
-
-
+        //((ToggleButton) findViewById(R.id.pause)).setOnCheckedChangeListener((view, isChecked) -> pause(isChecked))
+        Log.v("tsttst", "ThreadIdRECOGNIZEVOSK: " + Thread.currentThread().getId());
         Log.v("result01", "2");
         LibVosk.setLogLevel(LogLevel.INFO);
         Log.v("result01", "3");
@@ -98,15 +108,26 @@ public class Vosk extends AppCompatActivity implements RecognitionListener {
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void onResult(String hypothesis) {
-        Log.v("result01", "10: " + hypothesis);
-        //analyze_hypo(hypothesis);
+
+       Log.v("result01", "Text: " + hypothesis);
+        Log.v("tsttst" ,"hypothesis: " + hypothesis );
+        String[] result_splited = hypothesis.split(":");
+        String result = result_splited[1].trim().replaceAll("\"", "");
+
+        //String resultt = result.trim().replaceAll("", "");
+        String result_end = result.replace("}", "");
+        String madule_object = COMMANDREC.find_madule_and_object(result_end);
+        recognizeCommand(result_end, madule_object);
+
+
+        // analyze_hypo(hypothesis);
         // resultView.append(hypothesis + "\n");
 
     }
 
     @Override
     public void onFinalResult(String hypothesis) {
-        Log.v("result01", "11: " + hypothesis);
+       // COMMANDREC.find_madule_and_object(hypothesis);
         //resultView.append(hypothesis + "\n");
         if (speechStreamService != null) {
             speechStreamService = null;
@@ -116,70 +137,24 @@ public class Vosk extends AppCompatActivity implements RecognitionListener {
 
     @Override
     public void onPartialResult(String hypothesis) {
-        Log.v("result01", "12: " + hypothesis);
+
         // resultView.append(hypothesis + "\n");
     }
 
     @Override
     public void onError(Exception e) {
 
-        Log.v("result01", "13");
         setErrorState(e.getMessage());
     }
 
     @Override
     public void onTimeout() {
-        Log.v("result01", "14");
-        Log.v("result", "timeout");
+
     }
 
-    private void setUiState(int state) {
-        Log.v("result01", "15");
-        Log.v("result", "setUiState");
-        switch (state) {
-            case STATE_START:
-                //resultView.setText(R.string.preparing);
-                //resultView.setMovementMethod(new ScrollingMovementMethod());
-                //findViewById(R.id.recognize_file).setEnabled(false);
-                //findViewById(R.id.recognize_mic).setEnabled(false);
-                //findViewById(R.id.pause).setEnabled((false));
-                break;
-            case STATE_READY:
-                //resultView.setText(R.string.ready);
-                //((Button) findViewById(R.id.recognize_mic)).setText(R.string.recognize_microphone);
-                //findViewById(R.id.recognize_file).setEnabled(true);
-                //findViewById(R.id.recognize_mic).setEnabled(true);
-                //findViewById(R.id.pause).setEnabled((false));
-                break;
-            case STATE_DONE:
-                //((Button) findViewById(R.id.recognize_file)).setText(R.string.recognize_file);
-                //((Button) findViewById(R.id.recognize_mic)).setText(R.string.recognize_microphone);
-                //findViewById(R.id.recognize_file).setEnabled(true);
-                //findViewById(R.id.recognize_mic).setEnabled(true);
-                //findViewById(R.id.pause).setEnabled((false));
-                break;
-            case STATE_FILE:
-                //((Button) findViewById(R.id.recognize_file)).setText(R.string.stop_file);
-                //resultView.setText(getString(R.string.starting));
-                //findViewById(R.id.recognize_mic).setEnabled(false);
-                //findViewById(R.id.recognize_file).setEnabled(true);
-                //findViewById(R.id.pause).setEnabled((false));
-                break;
-            case STATE_MIC:
-                //((Button) findViewById(R.id.recognize_mic)).setText(R.string.stop_microphone);
-                //resultView.setText(getString(R.string.say_something));
-                //findViewById(R.id.recognize_file).setEnabled(false);
-                //findViewById(R.id.recognize_mic).setEnabled(true);
-                //findViewById(R.id.pause).setEnabled((true));
-                break;
-            default:
-                throw new IllegalStateException("Unexpected value: " + state);
-        }
-    }
 
     private void setErrorState(String message) {
-        Log.v("result01", "16");
-        Log.v("result", "setErrorState");
+
         //resultView.setText(message);
         //((Button) findViewById(R.id.recognize_mic)).setText(R.string.recognize_microphone);
         //findViewById(R.id.recognize_file).setEnabled(false);
@@ -188,23 +163,17 @@ public class Vosk extends AppCompatActivity implements RecognitionListener {
 
 
     private void recognizeMicrophone() {
-        Log.v("result01", "17");
-        Log.v("result", "recognizeMicrophone");
+
         if (speechService != null) {
             speechService.stop();
             speechService = null;
         } else {
             try {
-                Log.v("result01", "18");
-                Log.v("result01", "modelrec: " + model);
+
                 Recognizer rec = new Recognizer(model, 16000.0f);
-                Log.v("result01", "18.1");
                 speechService = new SpeechService(rec, 16000.0f);
-                Log.v("result01", "18.2");
                 speechService.startListening(this);
-                Log.v("result01", "18.3");
             } catch (IOException e) {
-                Log.v("result01", "18.5: " + e.getMessage());
                 setErrorState(e.getMessage());
             }
         }
@@ -212,11 +181,51 @@ public class Vosk extends AppCompatActivity implements RecognitionListener {
 
 
     private void pause(boolean checked) {
-        Log.v("result01", "19");
-        Log.v("result", "pause");
         if (speechService != null) {
             speechService.setPause(checked);
         }
+    }
+
+    public void recognizeCommand(String result, String command){
+        resultVosk.clear();
+        //return: command, madule, object, status
+        Log.v("tsttst" ,"command: " + result  );
+        String status;
+if(command.split("\\|").length > 1) {
+    String recognizedMadule = command.split("\\|")[0];
+    String recognizedObject = command.split("\\|")[1];
+
+    Log.v("tsttst", recognizedMadule);
+    Log.v("tsttst", recognizedObject);
+    if (recognizedMadule.trim().equals("Trigger Word")) {
+        status = "Buddy is ready, say you command in 15 seconds!";
+    } else if (recognizedMadule.trim().equals("Finding Object")) {
+        status = "Buddy is finding your " + recognizedObject.trim();
+    } else if (recognizedMadule.trim().equals("Scene Description")) {
+        status = "Buddy is describing the scene you want.";
+    } else if (recognizedMadule.trim().equals("Text Reading")) {
+        status = "Buddy is reading the text you want.";
+    } else {
+        status = command;
+    }
+    Log.v("tsttst", "status: " + status);
+
+    //mainActivity.runThread();
+    resultVosk.add(result);
+    resultVosk.add(recognizedMadule);
+    resultVosk.add(recognizedObject);
+    resultVosk.add(status);
+
+    Log.v("tsttst", "resultvosk0: " + resultVosk.get(0));
+    Log.v("tsttst", "resultvosk1: " + resultVosk.get(1));
+    Log.v("tsttst", "resultvosk2: " + resultVosk.get(2));
+    Log.v("tsttst", "resultvosk3: " + resultVosk.get(3));
+
+    if (myCallback != null) {
+        myCallback.updateMyText(resultVosk);
+    }
+}
+
     }
 
 

@@ -39,6 +39,7 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
     ndkVersion "23.1.7779620"
+
 }
 
 // import DownloadModels task
@@ -52,6 +53,7 @@ dependencies {
     implementation 'androidx.coordinatorlayout:coordinatorlayout:1.1.0'
     implementation 'com.google.android.material:material:1.1.0'
     implementation 'com.google.code.gson:gson:2.8.6'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.2'
     androidTestImplementation 'com.android.support.test:rules:1.0.2'
     androidTestImplementation 'com.google.truth:truth:1.0.1'
 
@@ -63,6 +65,9 @@ dependencies {
     //OD
     implementation 'org.tensorflow:tensorflow-lite:2.4.0'
     implementation 'org.tensorflow:tensorflow-lite-gpu:2.4.0'
+
+    //take frames
+    implementation 'com.karumi:dexter:4.2.0'
 
 
 

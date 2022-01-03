@@ -1,6 +1,7 @@
 package org.vosk.demo.tts;
 
 import android.speech.tts.TextToSpeech;
+import android.util.Log;
 
 import org.vosk.demo.MainActivity;
 import org.vosk.demo.utils.Utils;
@@ -23,6 +24,7 @@ public class Speech {
                     tts.setSpeechRate(Utils.ttsSpeed);
                     tts.setPitch(Utils.ttsPitch);
                     tts.speak(S_str, TextToSpeech.QUEUE_FLUSH, null);
+                    Log.v("sss01", "speak");
                 }
             }
         });

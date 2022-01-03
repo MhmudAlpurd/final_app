@@ -1,6 +1,7 @@
 package org.vosk.demo.utils;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.widget.Toast;
 
 public class Utils {
@@ -10,6 +11,10 @@ public class Utils {
 
     public static void toast(Context context, String txt){
         Toast.makeText(context, txt, Toast.LENGTH_SHORT).show();
+    }
+
+    public static Bitmap getBitmap(Bitmap  bitmap){
+        return bitmap;
     }
 
 
