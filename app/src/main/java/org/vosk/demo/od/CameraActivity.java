@@ -15,8 +15,9 @@
  */
 
 package org.vosk.demo.od;
-
+import org.vosk.demo.tts.Speech;
 import android.Manifest;
+import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -35,42 +36,44 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Trace;
+import android.util.Log;
 import android.util.Size;
 import android.view.Surface;
 import android.view.View;
-import android.view.ViewTreeObserver;
 import android.view.WindowManager;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+import org.vosk.demo.asr.MyCallBacks;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 import org.vosk.demo.R;
+import org.vosk.demo.asr.Vosk;
 import org.vosk.demo.od.env.ImageUtils;
 import org.vosk.demo.od.env.Logger;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.List;
 
 public abstract class CameraActivity extends AppCompatActivity
-    implements OnImageAvailableListener,
+        implements OnImageAvailableListener,
         Camera.PreviewCallback,
 //        CompoundButton.OnCheckedChangeListener,
-        View.OnClickListener {
+        View.OnClickListener, MyCallBacks {
   private static final Logger LOGGER = new Logger();
 
   private static final int PERMISSIONS_REQUEST = 1;
-
+  private static final int PERMISSIONS_REQUEST_RECORD_AUDIO = 1;
   private static final String PERMISSION_CAMERA = Manifest.permission.CAMERA;
   private static final String ASSET_PATH = "";
   protected int previewWidth = 0;
@@ -96,7 +99,10 @@ public abstract class CameraActivity extends AppCompatActivity
   protected TextView frameValueTextView, cropValueTextView, inferenceTimeTextView;
   protected ImageView bottomSheetArrowImageView;
   private ImageView plusImageView, minusImageView;
+  private TextView txt_command_info, txt_module_info, txt_object_info, txt_isExist_info, txt_status_info;
   protected ListView deviceView;
+  private static Context mContext;
+  private static Activity mActivity;
   protected TextView threadsTextView;
   protected ListView modelView;
   /** Current indices of device and model. */
@@ -111,10 +117,29 @@ public abstract class CameraActivity extends AppCompatActivity
     LOGGER.d("onCreate " + this);
     super.onCreate(null);
     getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+    mContext = getApplicationContext();
+    mActivity = getmActivity();
+
+    txt_command_info = findViewById(R.id.txt_command_info);
+    txt_isExist_info = findViewById(R.id.txt_isExist_info);
+    txt_module_info = findViewById(R.id.txt_module_info);
+    txt_object_info = findViewById(R.id.txt_object_info);
+    txt_status_info = findViewById(R.id.txt_status_info);
+
+
+    talk("Welcome to the buddy!");
+
+
+    if(checkPermission()){
+      Vosk vosk = new Vosk(CameraActivity.this);
+      vosk.recognize();
+
+    }
+
+
 
     setContentView(R.layout.tfe_od_activity_camera);
     Toolbar toolbar = findViewById(R.id.toolbar);
-
     setSupportActionBar(toolbar);
     getSupportActionBar().setDisplayShowTitleEnabled(false);
 
@@ -124,16 +149,17 @@ public abstract class CameraActivity extends AppCompatActivity
       requestPermission();
     }
 
-    threadsTextView = findViewById(R.id.threads);
-    currentNumThreads = Integer.parseInt(threadsTextView.getText().toString().trim());
-    plusImageView = findViewById(R.id.plus);
-    minusImageView = findViewById(R.id.minus);
-    deviceView = findViewById(R.id.device_list);
+
+   // threadsTextView = findViewById(R.id.threads);
+   // currentNumThreads = Integer.parseInt(threadsTextView.getText().toString().trim());
+  //  plusImageView = findViewById(R.id.plus);
+    //minusImageView = findViewById(R.id.minus);
+    //deviceView = findViewById(R.id.device_list);
     deviceStrings.add("CPU");
     deviceStrings.add("GPU");
     deviceStrings.add("NNAPI");
-    deviceView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-    ArrayAdapter<String> deviceAdapter =
+    //deviceView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+    /*ArrayAdapter<String> deviceAdapter =
             new ArrayAdapter<>(
                     CameraActivity.this , R.layout.deviceview_row, R.id.deviceview_row_text, deviceStrings);
     deviceView.setAdapter(deviceAdapter);
@@ -145,32 +171,38 @@ public abstract class CameraActivity extends AppCompatActivity
               public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 updateActiveModel();
               }
-            });
+            });*/
 
-    bottomSheetLayout = findViewById(R.id.bottom_sheet_layout);
-    gestureLayout = findViewById(R.id.gesture_layout);
-    sheetBehavior = BottomSheetBehavior.from(bottomSheetLayout);
-    bottomSheetArrowImageView = findViewById(R.id.bottom_sheet_arrow);
-    modelView = findViewById((R.id.model_list));
+    //bottomSheetLayout = findViewById(R.id.bottom_sheet_layout);
+    //gestureLayout = findViewById(R.id.gesture_layout);
+    //sheetBehavior = BottomSheetBehavior.from(bottomSheetLayout);
+    //bottomSheetArrowImageView = findViewById(R.id.bottom_sheet_arrow);
+    //modelView = findViewById((R.id.model_list));
 
     modelStrings = getModelStrings(getAssets(), ASSET_PATH);
-    modelView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-    ArrayAdapter<String> modelAdapter =
+   // modelStrings.add("yolov5m-fp16-320.tflite");
+    Log.v("res03", modelStrings+"");
+   //modelView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+    Log.v("res03", modelView+"");
+
+/*    ArrayAdapter<String> modelAdapter =
             new ArrayAdapter<>(
                     CameraActivity.this , R.layout.listview_row, R.id.listview_row_text, modelStrings);
-    modelView.setAdapter(modelAdapter);
-    modelView.setItemChecked(defaultModelIndex, true);
-    currentModel = defaultModelIndex;
-    modelView.setOnItemClickListener(
+    modelView.setAdapter(modelAdapter);*/
+    //modelView.setItemChecked(defaultModelIndex, true);
+    //modelView = ["yolov5m-fp16-320.tflite"];
+    Log.v("res03", modelView+" MODELVIEW");
+    //currentModel = defaultModelIndex;
+/*   modelView.setOnItemClickListener(
             new AdapterView.OnItemClickListener() {
               @Override
               public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 updateActiveModel();
               }
-            });
+            });*/
 
-    ViewTreeObserver vto = gestureLayout.getViewTreeObserver();
-    vto.addOnGlobalLayoutListener(
+    //ViewTreeObserver vto = gestureLayout.getViewTreeObserver();
+/*    vto.addOnGlobalLayoutListener(
         new ViewTreeObserver.OnGlobalLayoutListener() {
           @Override
           public void onGlobalLayout() {
@@ -185,9 +217,9 @@ public abstract class CameraActivity extends AppCompatActivity
             sheetBehavior.setPeekHeight(height);
           }
         });
-    sheetBehavior.setHideable(false);
+    sheetBehavior.setHideable(false);*/
 
-    sheetBehavior.setBottomSheetCallback(
+/*    sheetBehavior.setBottomSheetCallback(
         new BottomSheetBehavior.BottomSheetCallback() {
           @Override
           public void onStateChanged(@NonNull View bottomSheet, int newState) {
@@ -196,35 +228,50 @@ public abstract class CameraActivity extends AppCompatActivity
                 break;
               case BottomSheetBehavior.STATE_EXPANDED:
                 {
-                  bottomSheetArrowImageView.setImageResource(R.drawable.icn_chevron_down);
+                 // bottomSheetArrowImageView.setImageResource(R.drawable.icn_chevron_down);
                 }
                 break;
               case BottomSheetBehavior.STATE_COLLAPSED:
                 {
-                  bottomSheetArrowImageView.setImageResource(R.drawable.icn_chevron_up);
+                //  bottomSheetArrowImageView.setImageResource(R.drawable.icn_chevron_up);
                 }
                 break;
               case BottomSheetBehavior.STATE_DRAGGING:
                 break;
               case BottomSheetBehavior.STATE_SETTLING:
-                bottomSheetArrowImageView.setImageResource(R.drawable.icn_chevron_up);
+               // bottomSheetArrowImageView.setImageResource(R.drawable.icn_chevron_up);
                 break;
             }
           }
 
           @Override
           public void onSlide(@NonNull View bottomSheet, float slideOffset) {}
-        });
+        });*/
 
-    frameValueTextView = findViewById(R.id.frame_info);
-    cropValueTextView = findViewById(R.id.crop_info);
-    inferenceTimeTextView = findViewById(R.id.inference_info);
+    //frameValueTextView = findViewById(R.id.frame_info);
+  //  cropValueTextView = findViewById(R.id.crop_info);
+    // inferenceTimeTextView = findViewById(R.id.inference_info);
 
-    plusImageView.setOnClickListener(this);
-    minusImageView.setOnClickListener(this);
+   // plusImageView.setOnClickListener(this);
+   // minusImageView.setOnClickListener(this);
   }
 
+  public void talk(String txt){
+    Speech.talk(txt);
+  }
+  public static Context getmContext() { return mContext; }
 
+  public static Activity getmActivity(){return mActivity; }
+
+  private boolean checkPermission() {
+    if (ActivityCompat.checkSelfPermission(CameraActivity.this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
+      return true;
+    }else{
+      ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, PERMISSIONS_REQUEST_RECORD_AUDIO);
+      return false;
+    }
+
+  }
 
   protected ArrayList<String> getModelStrings(AssetManager mgr, String path){
     ArrayList<String> res = new ArrayList<String>();
@@ -580,36 +627,36 @@ public abstract class CameraActivity extends AppCompatActivity
 
   @Override
   public void onClick(View v) {
-    if (v.getId() == R.id.plus) {
-      String threads = threadsTextView.getText().toString().trim();
-      int numThreads = Integer.parseInt(threads);
+/*    if (v.getId() == R.id.plus) {
+    //  String threads = threadsTextView.getText().toString().trim();
+     // int numThreads = Integer.parseInt(threads);
       if (numThreads >= 9) return;
       numThreads++;
-      threadsTextView.setText(String.valueOf(numThreads));
+      //threadsTextView.setText(String.valueOf(numThreads));
       setNumThreads(numThreads);
     } else if (v.getId() == R.id.minus) {
-      String threads = threadsTextView.getText().toString().trim();
-      int numThreads = Integer.parseInt(threads);
+    //  String threads = threadsTextView.getText().toString().trim();
+     // int numThreads = Integer.parseInt(threads);
       if (numThreads == 1) {
         return;
       }
       numThreads--;
       threadsTextView.setText(String.valueOf(numThreads));
       setNumThreads(numThreads);
-    }
+    }*/
   }
 
-  protected void showFrameInfo(String frameInfo) {
-    frameValueTextView.setText(frameInfo);
-  }
+/*  protected void showFrameInfo(String frameInfo) {
+   // frameValueTextView.setText(frameInfo);
+  }*/
 
-  protected void showCropInfo(String cropInfo) {
+/*  protected void showCropInfo(String cropInfo) {
     cropValueTextView.setText(cropInfo);
-  }
+  }*/
 
-  protected void showInference(String inferenceTime) {
+/*  protected void showInference(String inferenceTime) {
     inferenceTimeTextView.setText(inferenceTime);
-  }
+  }*/
 
   protected abstract void updateActiveModel();
   protected abstract void processImage();
@@ -623,4 +670,51 @@ public abstract class CameraActivity extends AppCompatActivity
   protected abstract void setNumThreads(int numThreads);
 
   protected abstract void setUseNNAPI(boolean isChecked);
+
+  static public void initElements(@NonNull List<String> resultVosk){
+    Log.v("tsttst" ,"recvosk0: " + resultVosk.get(0) );
+    Log.v("tsttst" ,"recvosk1: " + resultVosk.get(1) );
+    Log.v("tsttst" ,"recvosk2: " + resultVosk.get(2) );
+    Log.v("tsttst" ,"recvosk3: " + resultVosk.get(3) );
+
+    try{
+
+      Log.v("res03", "resultvosk0: " + resultVosk.get(0));
+    }catch (NullPointerException e){
+      Log.v("tsttst" ,"null: " + e );
+    }
+
+  }
+  public boolean  objIsExist(String desiredObj, @NonNull List<String> recognizedObjs){
+
+    boolean isExist = false;
+    for(String i: recognizedObjs){
+      if (i.equals(desiredObj)){
+        isExist = true;
+      }else {
+        isExist = false;
+      }
+
+    }
+
+    return isExist;
+  }
+
+  @Override
+  public void updateMyText(List resultVosk) {
+    Log.v("test03", resultVosk.get(0)+"");
+    ((TextView)findViewById(R.id.txt_command_info)).setText("Command: " + resultVosk.get(0));
+    ((TextView)findViewById(R.id.txt_module_info)).setText("Madule: " + resultVosk.get(1));
+    ((TextView)findViewById(R.id.txt_object_info)).setText("Object: " + resultVosk.get(2));
+    ((TextView)findViewById(R.id.txt_status_info)).setText("Status: "+ resultVosk.get(3));
+    //boolean isEx = objIsExist(resultVosk.get(2).toString().trim().toLowerCase(), resultObjs);
+    //((TextView)findViewById(R.id.txt_isExist_info)).setText("IsExist: "+ isEx);
+
+    if(!resultVosk.get(3).toString().equals("Say, Hey Buddy!| nothing")){
+      talk(resultVosk.get(3).toString());
+    }
+
+  }
+
+
 }

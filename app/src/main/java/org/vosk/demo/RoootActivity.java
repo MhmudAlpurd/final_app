@@ -10,6 +10,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import org.vosk.demo.od.DetectorActivity;
+
 import java.util.List;
 
 public class RoootActivity extends AppCompatActivity {
@@ -35,7 +37,7 @@ public class RoootActivity extends AppCompatActivity {
             public void onClick(View view) {
                 tapToConnect.setVisibility(View.GONE);
                 connecting.setVisibility(View.VISIBLE);
-                Intent intent = new Intent(RoootActivity.this, MainActivity.class);
+                Intent intent = new Intent(RoootActivity.this, DetectorActivity.class);
                 startActivity(intent);
             }
         });

@@ -41,6 +41,7 @@ import org.vosk.demo.Callback;
 import org.vosk.demo.MainActivity;
 import org.vosk.demo.R;
 import org.vosk.demo.RoootActivity;
+import org.vosk.demo.od.CameraActivity;
 import org.vosk.demo.tts.Speech;
 
 import java.io.IOException;
@@ -49,12 +50,10 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Vosk implements RecognitionListener {
-
-    MyCallback myCallback = null;
-    public Vosk(MyCallback callback) {
-        this.myCallback = callback;
+    MyCallBacks myCallBacks = null;
+    public Vosk(MyCallBacks callback) {
+        this.myCallBacks = callback;
     }
-
 
     static private final int STATE_START = 0;
     static private final int STATE_READY = 1;
@@ -63,6 +62,7 @@ public class Vosk implements RecognitionListener {
     static private final int STATE_MIC = 4;
 
     List resultVosk = new ArrayList();
+
 
     /* Used to handle permission request */
     private static final int PERMISSIONS_REQUEST_RECORD_AUDIO = 1;
@@ -94,7 +94,7 @@ public class Vosk implements RecognitionListener {
         Log.v("result01", "7");
         Log.v("result01", "model: " + model);
 
-        StorageService.unpack(MainActivity.getmContext(), "model-en-us", "model",
+        StorageService.unpack(CameraActivity.getmContext(), "model-en-us", "model",
                 (model) -> {
                     Log.v("result01", "8");
                     this.model = model;
@@ -109,7 +109,7 @@ public class Vosk implements RecognitionListener {
     @Override
     public void onResult(String hypothesis) {
 
-       Log.v("result01", "Text: " + hypothesis);
+       Log.v("res03", "Text: " + hypothesis);
         Log.v("tsttst" ,"hypothesis: " + hypothesis );
         String[] result_splited = hypothesis.split(":");
         String result = result_splited[1].trim().replaceAll("\"", "");
@@ -216,13 +216,17 @@ if(command.split("\\|").length > 1) {
     resultVosk.add(recognizedObject);
     resultVosk.add(status);
 
+    CameraActivity.initElements(resultVosk);
     Log.v("tsttst", "resultvosk0: " + resultVosk.get(0));
     Log.v("tsttst", "resultvosk1: " + resultVosk.get(1));
     Log.v("tsttst", "resultvosk2: " + resultVosk.get(2));
     Log.v("tsttst", "resultvosk3: " + resultVosk.get(3));
+    Log.v("test03", resultVosk.get(0)+"");
+    //Log.v("test03", myCallBacks+"");
 
-    if (myCallback != null) {
-        myCallback.updateMyText(resultVosk);
+
+ if (myCallBacks != null) {
+     myCallBacks.updateMyText(resultVosk);
     }
 }
 

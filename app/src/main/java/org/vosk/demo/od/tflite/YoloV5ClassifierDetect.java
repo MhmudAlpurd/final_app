@@ -16,7 +16,6 @@ limitations under the License.
 package org.vosk.demo.od.tflite;
 
 import static org.vosk.demo.od.env.Utils.expit;
-
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.RectF;

@@ -4,6 +4,7 @@ import android.speech.tts.TextToSpeech;
 import android.util.Log;
 
 import org.vosk.demo.MainActivity;
+import org.vosk.demo.od.CameraActivity;
 import org.vosk.demo.utils.Utils;
 
 import java.util.Locale;
@@ -15,7 +16,7 @@ public class Speech {
 
     public static void talk(String str){
         S_str  = str;
-        tts = new TextToSpeech(MainActivity.getmContext(), new TextToSpeech.OnInitListener() {
+        tts = new TextToSpeech(CameraActivity.getmContext(), new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int status) {
 

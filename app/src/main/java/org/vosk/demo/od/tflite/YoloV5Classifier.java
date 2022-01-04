@@ -15,6 +15,8 @@ limitations under the License.
 
 package org.vosk.demo.od.tflite;
 
+import static org.vosk.demo.MainActivity.MINIMUM_CONFIDENCE_TF_OD_API;
+
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.RectF;
@@ -23,12 +25,10 @@ import android.util.Log;
 
 import org.tensorflow.lite.Interpreter;
 import org.tensorflow.lite.Tensor;
-import org.vosk.demo.MainActivity;
 import org.vosk.demo.od.env.Logger;
 import org.vosk.demo.od.env.Utils;
 import org.tensorflow.lite.gpu.GpuDelegate;
 import org.tensorflow.lite.nnapi.NnApiDelegate;
-import org.vosk.demo.MainActivity;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -77,6 +77,7 @@ public class YoloV5Classifier implements Classifier {
         final YoloV5Classifier d = new YoloV5Classifier();
 
         String actualFilename = labelFilename.split("file:///android_asset/")[1];
+        Log.v("ssss", actualFilename);
         InputStream labelsInput = assetManager.open(actualFilename);
         BufferedReader br = new BufferedReader(new InputStreamReader(labelsInput));
         String line;
@@ -212,7 +213,7 @@ public class YoloV5Classifier implements Classifier {
 
     @Override
     public float getObjThresh() {
-        return MainActivity.MINIMUM_CONFIDENCE_TF_OD_API;
+        return (float) 0.3;
     }
 
     private static final Logger LOGGER = new Logger();
@@ -235,7 +236,7 @@ public class YoloV5Classifier implements Classifier {
     private static final int NUM_BOXES_PER_BLOCK = 3;
 
     // Number of threads in the java app
-    private static final int NUM_THREADS = 1;
+    private static final int NUM_THREADS = 6;
     private static boolean isNNAPI = false;
     private static boolean isGPU = false;
 

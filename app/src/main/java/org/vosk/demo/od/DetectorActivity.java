@@ -30,9 +30,13 @@ import android.os.SystemClock;
 import android.util.Log;
 import android.util.Size;
 import android.util.TypedValue;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+
 import org.vosk.demo.R;
+import org.vosk.demo.asr.MyCallBacks;
 import org.vosk.demo.od.customview.OverlayView;
 import org.vosk.demo.od.customview.OverlayView.DrawCallback;
 import org.vosk.demo.od.env.BorderedText;
@@ -42,24 +46,30 @@ import org.vosk.demo.od.tflite.Classifier;
 import org.vosk.demo.od.tflite.DetectorFactory;
 import org.vosk.demo.od.tflite.YoloV5Classifier;
 import org.vosk.demo.od.tracking.MultiBoxTracker;
+import org.vosk.demo.tts.Speech;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * An activity that uses a TensorFlowMultiBoxDetector and ObjectTracker to detect and then track
  * objects.
  */
-public class DetectorActivity extends CameraActivity implements OnImageAvailableListener {
+public class DetectorActivity extends CameraActivity implements OnImageAvailableListener , MyCallBacks {
     private static final Logger LOGGER = new Logger();
-
     private static final DetectorMode MODE = DetectorMode.TF_OD_API;
     private static final float MINIMUM_CONFIDENCE_TF_OD_API = 0.3f;
     private static final boolean MAINTAIN_ASPECT = true;
     private static final Size DESIRED_PREVIEW_SIZE = new Size(320, 320);
     private static final boolean SAVE_PREVIEW_BITMAP = false;
     private static final float TEXT_SIZE_DIP = 10;
+    int ntng = 0;
     OverlayView trackingOverlay;
     private Integer sensorOrientation;
 
@@ -81,6 +91,10 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
     private BorderedText borderedText;
 
+    ArrayList<String> lstObj = new ArrayList<>();
+
+
+
     @Override
     public void onPreviewSizeChosen(final Size size, final int rotation) {
         final float textSizePx =
@@ -91,7 +105,8 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
         tracker = new MultiBoxTracker(this);
 
-        final int modelIndex = modelView.getCheckedItemPosition();
+        //final int modelIndex = modelView.getCheckedItemPosition();
+        final int modelIndex = 0;
         final String modelString = modelStrings.get(modelIndex);
 
         try {
@@ -107,13 +122,12 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
         }
 
         int cropSize = detector.getInputSize();
-
+        Log.v("st01", "onPrview" + "DetectoraAct");
         previewWidth = size.getWidth();
         previewHeight = size.getHeight();
 
         sensorOrientation = rotation - getScreenOrientation();
         LOGGER.i("Camera orientation relative to screen canvas: %d", sensorOrientation);
-
         LOGGER.i("Initializing at size %dx%d", previewWidth, previewHeight);
         rgbFrameBitmap = Bitmap.createBitmap(previewWidth, previewHeight, Config.ARGB_8888);
         croppedBitmap = Bitmap.createBitmap(cropSize, cropSize, Config.ARGB_8888);
@@ -142,10 +156,16 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
         tracker.setFrameConfiguration(previewWidth, previewHeight, sensorOrientation);
     }
 
+    public void talk(String txt){
+        Speech.talk(txt);
+    }
+
     protected void updateActiveModel() {
         // Get UI information before delegating to background
-        final int modelIndex = modelView.getCheckedItemPosition();
-        final int deviceIndex = deviceView.getCheckedItemPosition();
+        //final int modelIndex = modelView.getCheckedItemPosition();
+        final int modelIndex = 0;
+        //final int deviceIndex = deviceView.getCheckedItemPosition();
+        final int deviceIndex = 0;
         String threads = threadsTextView.getText().toString().trim();
         final int numThreads = Integer.parseInt(threads);
 
@@ -189,14 +209,19 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
                 finish();
             }
 
+            device = "GPU";
+
 
             if (device.equals("CPU")) {
-                detector.useCPU();
+               detector.useCPU();
+               // detector.useNNAPI();
             } else if (device.equals("GPU")) {
-                detector.useGpu();
+               detector.useGpu();
+               // detector.useNNAPI();
             } else if (device.equals("NNAPI")) {
                 detector.useNNAPI();
             }
+
             detector.setNumThreads(numThreads);
 
             int cropSize = detector.getInputSize();
@@ -245,6 +270,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
                         LOGGER.i("Running detection on image " + currTimestamp);
                         final long startTime = SystemClock.uptimeMillis();
                         final List<Classifier.Recognition> results = detector.recognizeImage(croppedBitmap);
+                        lstObj.clear();
                         lastProcessingTimeMs = SystemClock.uptimeMillis() - startTime;
 
                         Log.e("CHECK", "run: " + results.size());
@@ -275,6 +301,9 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
                                 result.setLocation(location);
                                 mappedRecognitions.add(result);
+
+                                List<String> Objs = Arrays.asList(result.toString().split(" "));
+                                lstObj.add(Objs.get(1).trim().toLowerCase());
                             }
                         }
 
@@ -287,9 +316,9 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
                                 new Runnable() {
                                     @Override
                                     public void run() {
-                                        showFrameInfo(previewWidth + "x" + previewHeight);
-                                        showCropInfo(cropCopyBitmap.getWidth() + "x" + cropCopyBitmap.getHeight());
-                                        showInference(lastProcessingTimeMs + "ms");
+                                        //showFrameInfo(previewWidth + "x" + previewHeight);
+                                       // showCropInfo(cropCopyBitmap.getWidth() + "x" + cropCopyBitmap.getHeight());
+                                        //showInference(lastProcessingTimeMs + "ms");
                                     }
                                 });
                     }
@@ -304,6 +333,39 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
     @Override
     protected Size getDesiredPreviewFrameSize() {
         return DESIRED_PREVIEW_SIZE;
+    }
+
+    @Override
+    public void updateMyText(List resultVosk) {
+        ((TextView)findViewById(R.id.txt_command_info)).setText(" " + resultVosk.get(0).toString().trim().toLowerCase());
+        ((TextView)findViewById(R.id.txt_module_info)).setText(" " + resultVosk.get(1).toString().trim().toLowerCase());
+        ((TextView)findViewById(R.id.txt_object_info)).setText(" " + resultVosk.get(2).toString().trim().toLowerCase());
+        ((TextView)findViewById(R.id.txt_status_info)).setText(" "+ resultVosk.get(3).toString().trim().toLowerCase());
+
+        if (!resultVosk.get(3).toString().trim().equals("Say, Hey Buddy!| nothing")){
+            talk(resultVosk.get(3).toString());
+        }else if (resultVosk.get(3).toString().trim().equals("Say, Hey Buddy!| nothing") && ntng == 0){
+            ntng += 1;
+            talk("Say Hey buddy to start functions!");
+        }
+
+
+
+        Log.v("ttt02", lstObj + "");
+        Log.v("ttt03", resultVosk.get(2)+"");
+       if(resultVosk.get(2).toString().trim().toLowerCase().equals("nothing")){
+           ((TextView)findViewById(R.id.txt_isExist_info)).setText("Finding Object module is not enable!");
+       }else {
+           if (objIsExist(resultVosk.get(2).toString().trim(), lstObj)) {
+               ((TextView) findViewById(R.id.txt_isExist_info)).setText(" " + resultVosk.get(2) + " found");
+               talk(resultVosk.get(2) + " found");
+           } else {
+               ((TextView) findViewById(R.id.txt_isExist_info)).setText(" " + resultVosk.get(2) + " not found");
+               talk(resultVosk.get(2) + " not found");
+           }
+
+       }
+
     }
 
     // Which detection model to use: by default uses Tensorflow Object Detection API frozen
@@ -321,4 +383,22 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
     protected void setNumThreads(final int numThreads) {
         runInBackground(() -> detector.setNumThreads(numThreads));
     }
+
+    public boolean  objIsExist(String desiredObj, @NonNull List<String> recognizedObjs){
+Log.v("thh2", desiredObj);
+Log.v("thh2", recognizedObjs+"");
+        boolean isExist = false;
+        for(String i: recognizedObjs){
+            if (i.equals(desiredObj)){
+                isExist = true;
+                break;
+            }else {
+                isExist = false;
+            }
+
+        }
+        Log.v("thh2", isExist+"");
+        return isExist;
+    }
+
 }

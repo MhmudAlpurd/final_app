@@ -24,15 +24,18 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@android:color/black"
+        android:background="#01425a"
+        android:layout_centerHorizontal="true"
         android:orientation="vertical">
 
 
         <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:tools="http://schemas.android.com/tools"
             android:id="@+id/container"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="70dp"
+            android:layout_width="250dp"
+            android:layout_height="400dp"
             tools:context="org.tensorflow.demo.CameraActivity" />
 
         <androidx.appcompat.widget.Toolbar
@@ -44,12 +47,156 @@
 
             <ImageView
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:src="@drawable/cogniteye_logo" />
         </androidx.appcompat.widget.Toolbar>
+
+        <LinearLayout
+            android:layout_below="@id/container"
+            android:id="@+id/ll_command"
+            android:layout_marginTop="20dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal">
+    <TextView
+        android:textStyle="bold"
+        android:textSize="17dp"
+        android:textColor="@color/cardview_light_background"
+        android:textDirection="ltr"
+        android:layout_margin="5dp"
+        android:id="@+id/txt_command"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Command: " />
+
+    <TextView
+        android:textColor="@color/cardview_light_background"
+        android:textSize="15dp"
+        android:textDirection="ltr"
+        android:layout_margin="5dp"
+        android:id="@+id/txt_command_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="..."/>
+
+</LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+                <TextView
+                    android:textStyle="bold"
+                    android:textSize="17dp"
+                    android:textColor="@color/cardview_light_background"
+                    android:textDirection="ltr"
+                    android:layout_margin="5dp"
+                    android:id="@+id/txt_module"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Module: " />
+
+                <TextView
+                    android:textColor="@color/cardview_light_background"
+                    android:textSize="15dp"
+                    android:textDirection="ltr"
+                    android:layout_margin="5dp"
+                    android:id="@+id/txt_module_info"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="..."/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+                <TextView
+                    android:textStyle="bold"
+                    android:textSize="17dp"
+                    android:textColor="@color/cardview_light_background"
+                    android:textDirection="ltr"
+                    android:layout_margin="5dp"
+                    android:id="@+id/txt_object"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Object: " />
+
+                <TextView
+                    android:textColor="@color/cardview_light_background"
+                    android:textSize="15dp"
+                    android:textDirection="ltr"
+                    android:layout_margin="5dp"
+                    android:id="@+id/txt_object_info"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="..."/>
+
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+                <TextView
+                    android:textStyle="bold"
+                    android:textSize="17dp"
+                    android:textColor="@color/cardview_light_background"
+                    android:textDirection="ltr"
+                    android:layout_margin="5dp"
+                    android:id="@+id/txt_isExist"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Is Exist: " />
+
+                <TextView
+                    android:textColor="@color/cardview_light_background"
+                    android:textSize="15dp"
+                    android:textDirection="ltr"
+                    android:layout_margin="5dp"
+                    android:id="@+id/txt_isExist_info"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="..."/>
+
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+                <TextView
+                    android:textStyle="bold"
+                    android:textSize="17dp"
+                    android:textColor="@color/cardview_light_background"
+                    android:textDirection="ltr"
+                    android:layout_margin="5dp"
+                    android:id="@+id/txt_status"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Status: " />
+
+                <TextView
+                    android:textColor="@color/cardview_light_background"
+                    android:textSize="15dp"
+                    android:textDirection="ltr"
+                    android:layout_margin="5dp"
+                    android:id="@+id/txt_status_info"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="..."/>
+
+            </LinearLayout>
+        </LinearLayout>
 
     </RelativeLayout>
 
-    <include
+
+
+<!--  <include
         android:id="@+id/bottom_sheet_layout"
-        layout="@layout/tfe_od_layout_bottom_sheet" />
+        layout="@layout/tfe_od_layout_bottom_sheet" />-->
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
