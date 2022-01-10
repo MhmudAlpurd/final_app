@@ -35,16 +35,17 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme.ObjectDetection">
         <activity
+            android:name=".setting.SettingActivity"
+            android:exported="true" />
+        <activity
             android:name=".DevActivity"
             android:exported="true" />
         <activity
             android:name=".MainActivity"
             android:exported="true" />
-
         <activity
             android:name=".od.DetectorActivity"
-            android:exported="true" >
-        </activity>
+            android:exported="true"></activity>
         <activity
             android:name=".od.CameraActivity"
             android:label="CameraActivity" />
@@ -53,18 +54,16 @@
             android:exported="true"
             android:label="@string/tfe_od_app_name"
             android:screenOrientation="fullSensor">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
         </activity>
         <activity
             android:name=".asr.Vosk"
             android:exported="true"
             tools:ignore="Instantiatable" />
-
     </application>
 
 </manifest>

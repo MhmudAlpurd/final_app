@@ -15,11 +15,14 @@
  */
 
 package org.vosk.demo.od;
+import org.vosk.demo.RoootActivity;
+import org.vosk.demo.setting.SettingActivity;
 import org.vosk.demo.tts.Speech;
 import android.Manifest;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.hardware.Camera;
@@ -38,6 +41,7 @@ import android.os.HandlerThread;
 import android.os.Trace;
 import android.util.Log;
 import android.util.Size;
+import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.View;
 import android.view.WindowManager;
@@ -64,6 +68,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
+
 
 public abstract class CameraActivity extends AppCompatActivity
         implements OnImageAvailableListener,
@@ -109,6 +114,7 @@ public abstract class CameraActivity extends AppCompatActivity
   int currentDevice = -1;
   int currentModel = -1;
   int currentNumThreads = -1;
+  float x1, x2, y1, y2;
 
   ArrayList<String> deviceStrings = new ArrayList<String>();
 
@@ -714,6 +720,30 @@ public abstract class CameraActivity extends AppCompatActivity
       talk(resultVosk.get(3).toString());
     }
 
+  }
+
+  @Override
+  public boolean onTouchEvent(MotionEvent touchEvent) {
+    switch (touchEvent.getAction()){
+
+      case MotionEvent.ACTION_DOWN:
+        x1 = touchEvent.getX();
+        y1 = touchEvent.getY();
+        break;
+
+      case MotionEvent.ACTION_UP:
+        x2 = touchEvent.getX();
+        y2 = touchEvent.getY();
+
+
+        if(x1 < x2){
+          Intent intent = new Intent(CameraActivity.this, SettingActivity.class);
+          startActivity(intent);
+        }
+        break;
+
+    }
+    return false;
   }
 
 
